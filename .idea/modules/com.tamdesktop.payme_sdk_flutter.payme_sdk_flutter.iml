@@ -41,6 +41,6 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.4.21" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.21" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.PayME-Tech:PayME-SDK-Android:0.9.29@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.PayME-Tech:PayME-SDK-Android:0.9.30@aar" level="project" />
   </component>
 </module>

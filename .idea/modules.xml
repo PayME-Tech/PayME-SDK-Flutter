@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.tamdesktop.payme_sdk_flutter.payme_sdk_flutter.iml" filepath="$PROJECT_DIR$/.idea/modules/com.tamdesktop.payme_sdk_flutter.payme_sdk_flutter.iml" />
       <module fileurl="file://$PROJECT_DIR$/payme_sdk_flutter.iml" filepath="$PROJECT_DIR$/payme_sdk_flutter.iml" />
-      <module fileurl="file://$PROJECT_DIR$/example/android/payme_sdk_flutter_example_android.iml" filepath="$PROJECT_DIR$/example/android/payme_sdk_flutter_example_android.iml" />
     </modules>
   </component>
 </project>

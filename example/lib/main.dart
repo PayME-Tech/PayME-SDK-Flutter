@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:payme_sdk_flutter/payme_sdk_flutter.dart';
+import 'package:payme_sdk_flutter_example/row_input.dart';
 
 void main() {
   runApp(MyApp());
@@ -30,6 +31,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _accountStatus = 'Not Connected. Please LOGIN first';
   bool _connected = false;
+  String _payCode = 'PAYME';
 
   @override
   Widget build(BuildContext context) {
@@ -47,100 +49,107 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: Column(
             children: [
-              Text(_accountStatus),
-              ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final status = await PaymeSdkFlutter.login(
-                        '1001', '0929000200', sdkArgs);
-                    setState(() {
-                      _accountStatus = status;
-                      _connected = true;
-                    });
-                    print(status);
-                  } catch (e) {
-                    print(e);
-                    setState(() {
-                      _connected = false;
-                    });
-                  }
-                },
-                child: Text("1. Login"),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(_accountStatus),
               ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () async {
-                        try {
-                          final info = await PaymeSdkFlutter.getAccountInfo();
-                          print(info);
-                        } catch (e) {
-                          print(e);
-                        }
-                      }
-                    : null,
-                child: Text("2. getAccountInfo"),
+              _buildButton(() async {
+                try {
+                  final status = await PaymeSdkFlutter.login(
+                      '1001', '0929000200', sdkArgs);
+                  setState(() {
+                    _accountStatus = status;
+                    _connected = true;
+                  });
+                  print(status);
+                } catch (e) {
+                  print(e);
+                  setState(() {
+                    _connected = false;
+                  });
+                }
+              }, 'Login'),
+              _buildDropdown(),
+              _buildButton(() {
+                _connected ? PaymeSdkFlutter.openWallet() : null;
+              }, 'Open Wallet'),
+              RowFunction(
+                placeholder: 'Deposit amount',
+                onPress: (value) => print(value),
+                text: 'deposit',
               ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () async {
-                        try {
-                          final info =
-                              await PaymeSdkFlutter.getSupportedServices();
-                          print(info);
-                        } catch (e) {
-                          print(e);
-                        }
-                      }
-                    : null,
-                child: Text("3. getSupportedServices"),
+              RowFunction(
+                placeholder: 'Withdraw amount',
+                onPress: (value) => print(value),
+                text: 'withdraw',
               ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () {
-                        PaymeSdkFlutter.openWallet();
-                      }
-                    : null,
-                child: Text("4. openWallet"),
-              ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () {
-                        try {
-                          PaymeSdkFlutter.deposit();
-                        } catch (e) {
-                          print(e);
-                        }
-                      }
-                    : null,
-                child: Text("5. deposit"),
-              ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () {
-                        try {
-                          PaymeSdkFlutter.openKYC();
-                        } catch (e) {
-                          print(e);
-                        }
-                      }
-                    : null,
-                child: Text("6. openKYC"),
-              ),
-              ElevatedButton(
-                onPressed: _connected
-                    ? () {
-                        try {
-                          PaymeSdkFlutter.openService('POWE', 'Điện');
-                        } catch (e) {
-                          print(e);
-                        }
-                      }
-                    : null,
-                child: Text("7. openService"),
-              ),
+              RowFunction(
+                placeholder: 'Transfer amount',
+                onPress: (value) => print(value),
+                text: 'transfer',
+              )
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildButton(VoidCallback onPress, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 18),
+      child: SizedBox(
+          width: double.infinity,
+          height: 40,
+          child: ElevatedButton(
+            style: ButtonStyle(
+                foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ))),
+            onPressed: onPress,
+            child: Text(text),
+          )),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 20, 0),
+            child: Text('Select PAYCODE: '),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                color: Colors.black12, borderRadius: BorderRadius.circular(30)),
+            child: DropdownButton<String>(
+              value: _payCode,
+              icon: Icon(Icons.arrow_drop_down),
+              iconSize: 42,
+              underline: SizedBox(),
+              items: <String>['PAYME', 'ATM', 'CREDIT', 'VNPAY']
+                  .map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                    child: Text(value),
+                  ),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _payCode = value!;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
