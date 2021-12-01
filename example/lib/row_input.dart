@@ -14,7 +14,7 @@ class RowFunction extends StatefulWidget {
 }
 
 class _RowFunctionState extends State<RowFunction> {
-  final _controller = TextEditingController();
+  final _controller = TextEditingController(text: '10000');
   String amount = '0';
 
   @override
@@ -26,6 +26,7 @@ class _RowFunctionState extends State<RowFunction> {
           child: TextField(
             controller: _controller,
             decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(26.0),
               ),
@@ -35,23 +36,31 @@ class _RowFunctionState extends State<RowFunction> {
         ),
         Positioned.fill(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 26),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 22),
             child: Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                          )
-                      )
+                child: Container(
+                  width: 110,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all<Color>(Colors.white),
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.blue),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ))),
+                    onPressed: () {
+                      widget.onPress(_controller.text);
+                    },
+                    child: Text(
+                      widget.text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  onPressed: () {
-                    widget.onPress(_controller.text);
-                  },
-                  child: Text(widget.text),
                 )),
           ),
         ),

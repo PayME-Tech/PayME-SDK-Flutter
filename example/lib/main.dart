@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:payme_sdk_flutter/payme_sdk_flutter.dart';
 import 'package:payme_sdk_flutter_example/row_input.dart';
+import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(home: MyApp()));
 }
 
 const APP_TOKEN_DEFAULT_SANDBOX =
@@ -31,7 +33,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _accountStatus = 'Not Connected. Please LOGIN first';
   bool _connected = false;
-  String _payCode = 'PAYME';
+  PaymeSdkFlutterPayCode _payCode = PaymeSdkFlutterPayCode.PAYME;
+  TextEditingController _userIdController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,49 +50,173 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('PayME SDK Example'),
         ),
-        body: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text(_accountStatus),
-              ),
-              _buildButton(() async {
-                try {
-                  final status = await PaymeSdkFlutter.login(
-                      '1001', '0929000200', sdkArgs);
-                  setState(() {
-                    _accountStatus = status;
-                    _connected = true;
-                  });
-                  print(status);
-                } catch (e) {
-                  print(e);
-                  setState(() {
-                    _connected = false;
-                  });
-                }
-              }, 'Login'),
-              _buildDropdown(),
-              _buildButton(() {
-                _connected ? PaymeSdkFlutter.openWallet() : null;
-              }, 'Open Wallet'),
-              RowFunction(
-                placeholder: 'Deposit amount',
-                onPress: (value) => print(value),
-                text: 'deposit',
-              ),
-              RowFunction(
-                placeholder: 'Withdraw amount',
-                onPress: (value) => print(value),
-                text: 'withdraw',
-              ),
-              RowFunction(
-                placeholder: 'Transfer amount',
-                onPress: (value) => print(value),
-                text: 'transfer',
-              )
-            ],
+        body: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            print('aaaaa');
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(_accountStatus),
+                ),
+                _buildTextField('UserId', _userIdController),
+                _buildTextField('Phone', _phoneController),
+                Container(
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      _buildButton(() async {
+                        try {
+                          final status = await PaymeSdkFlutter.login(
+                              _userIdController.text, _phoneController.text, sdkArgs);
+                          setState(() {
+                            _accountStatus = status;
+                            _connected = true;
+                          });
+                          print(status);
+                        } catch (e) {
+                          print(e);
+                          setState(() {
+                            _connected = false;
+                          });
+                        }
+                      }, 'Login'),
+                    _buildButton(() async {
+                      try {
+                        await PaymeSdkFlutter.logout();
+                        setState(() {
+                          _accountStatus = 'Not Connected. Please LOGIN first';
+                          _connected = false;
+                        });
+                      } catch (e) {
+                        print(e);
+                        setState(() {
+                          _connected = false;
+                        });
+                      }
+                    }, 'Logout'),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildDropdown(),
+                      _buildButton(() {
+                        PaymeSdkFlutter.openWallet();
+                      }, 'Open Wallet'),
+                      _buildButton(() async {
+                        try {
+                          await PaymeSdkFlutter.openKYC();
+                        } on PlatformException catch (e) {
+                          showAlertDialog(context,
+                              content: e.message ?? 'Có lỗi xảy ra');
+                        }
+                      }, 'Open KYC'),
+                      RowFunction(
+                        placeholder: 'Deposit amount',
+                        onPress: (value) async {
+                          if (value.isEmpty) {
+                            return;
+                          }
+                          try {
+                            final response = await PaymeSdkFlutter.deposit(
+                                amount: int.parse(value));
+                            print(response);
+                          } on PlatformException catch (e) {
+                            print(e);
+                            showAlertDialog(context,
+                                title: 'Lỗi',
+                                content: e.message ?? 'Có lỗi xảy ra');
+                          }
+                        },
+                        text: 'deposit',
+                      ),
+                      RowFunction(
+                        placeholder: 'Withdraw amount',
+                        onPress: (value) async {
+                          if (value.isEmpty) {
+                            return;
+                          }
+                          try {
+                            final response = await PaymeSdkFlutter.withdraw(
+                                amount: int.parse(value));
+                            print(response);
+                          } on PlatformException catch (e) {
+                            print(e);
+                            showAlertDialog(context,
+                                title: 'Lỗi',
+                                content: e.message ?? 'Có lỗi xảy ra');
+                          }
+                        },
+                        text: 'withdraw',
+                      ),
+                      RowFunction(
+                        placeholder: 'Transfer amount',
+                        onPress: (value) async {
+                          if (value.isEmpty) {
+                            return;
+                          }
+                          try {
+                            final response = await PaymeSdkFlutter.transfer(
+                                amount: int.parse(value));
+                            print(response);
+                          } on PlatformException catch (e) {
+                            print(e);
+                            showAlertDialog(context,
+                                title: 'Lỗi',
+                                content: e.message ?? 'Có lỗi xảy ra');
+                          }
+                        },
+                        text: 'transfer',
+                      ),
+                      RowFunction(
+                        placeholder: 'Pay amount',
+                        onPress: (value) async {
+                          if (value.isEmpty) {
+                            return;
+                          }
+                          try {
+                            final response = await PaymeSdkFlutter.pay(
+                              int.parse(value),
+                              '10581207',
+                              DateTime.now().millisecondsSinceEpoch.toString(),
+                              _payCode,
+                            );
+                            print(response);
+                          } on PlatformException catch (e) {
+                            print(e);
+                            if (e.code != 'USER_CANCELLED') {
+                              showAlertDialog(context,
+                                  title: 'Lỗi',
+                                  content: e.message ?? 'Có lỗi xảy ra');
+                            }
+                          }
+                        },
+                        text: 'pay',
+                      ),
+                      _buildButton(() async {
+                        try {
+                          final response =
+                              await PaymeSdkFlutter.getSupportedServices();
+                          showAlertDialog(context,
+                              title: 'Lấy danh sách thành công',
+                              content: response.toString());
+                        } on PlatformException catch (e) {
+                          showAlertDialog(context,
+                              content: e.message ?? 'Có lỗi xảy ra');
+                        }
+                      }, 'Lấy danh sách dịch vụ'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -98,8 +226,7 @@ class _MyAppState extends State<MyApp> {
   Widget _buildButton(VoidCallback onPress, String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 18),
-      child: SizedBox(
-          width: double.infinity,
+      child: Container(
           height: 40,
           child: ElevatedButton(
             style: ButtonStyle(
@@ -115,6 +242,22 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+  Widget _buildTextField(String placeholder, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(26.0),
+          ),
+          hintText: placeholder,
+        ),
+      ),
+    );
+  }
+
   Widget _buildDropdown() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
@@ -125,20 +268,28 @@ class _MyAppState extends State<MyApp> {
             child: Text('Select PAYCODE: '),
           ),
           Container(
+            height: 40,
             decoration: BoxDecoration(
                 color: Colors.black12, borderRadius: BorderRadius.circular(30)),
-            child: DropdownButton<String>(
+            child: DropdownButton<PaymeSdkFlutterPayCode>(
               value: _payCode,
               icon: Icon(Icons.arrow_drop_down),
               iconSize: 42,
               underline: SizedBox(),
-              items: <String>['PAYME', 'ATM', 'CREDIT', 'VNPAY']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
+              items: [
+                PaymeSdkFlutterPayCode.PAYME,
+                PaymeSdkFlutterPayCode.ATM,
+                PaymeSdkFlutterPayCode.CREDIT,
+                PaymeSdkFlutterPayCode.MANUAL_BANK,
+                PaymeSdkFlutterPayCode.VN_PAY,
+                PaymeSdkFlutterPayCode.MOMO
+              ].map((PaymeSdkFlutterPayCode value) {
+                return DropdownMenuItem(
                   value: value,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                    child: Text(value),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                    child: Text(value.toString().split('.').last),
                   ),
                 );
               }).toList(),
@@ -151,6 +302,28 @@ class _MyAppState extends State<MyApp> {
           ),
         ],
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context,
+      {String title = 'Thông báo', String content = 'Có lỗi xảy ra'}) {
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              child: Text("Đã hiểu"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
