@@ -181,6 +181,10 @@ class PaymeSdkFlutter {
 
   static Future<dynamic> openHistory() async {
     final rs = await _channel.invokeMethod('openHistory');
+    if (Platform.isAndroid && rs is String) {
+      return jsonDecode(rs);
+    }
+    return rs;
   }
 
   static Future<dynamic> scanQR(PaymeSdkFlutterPayCode payCode) async {

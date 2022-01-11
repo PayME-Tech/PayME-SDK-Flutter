@@ -8,13 +8,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c9664ace-d89b-4b16-b013-7394027ff4e3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/android/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/com/tamdesktop/payme_sdk_flutter/PaymeSdkFlutterPlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/com/tamdesktop/payme_sdk_flutter/PaymeSdkFlutterPlugin.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftPaymeSdkFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftPaymeSdkFlutterPlugin.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/payme_sdk_flutter.podspec" beforeDir="false" afterPath="$PROJECT_DIR$/ios/payme_sdk_flutter.podspec" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/payme_sdk_flutter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/payme_sdk_flutter.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -99,9 +92,21 @@
       <option name="presentableId" value="Default" />
       <updated>1628245901521</updated>
     </task>
+    <task id="LOCAL-00001" summary="add close, openHistory, scanQR, payQRCode. not have edit username pay() yet">
+      <created>1641900861381</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1641900861381</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.md" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="add close, openHistory, scanQR, payQRCode. not have edit username pay() yet" />
+    <option name="LAST_COMMIT_MESSAGE" value="add close, openHistory, scanQR, payQRCode. not have edit username pay() yet" />
   </component>
 </project>
