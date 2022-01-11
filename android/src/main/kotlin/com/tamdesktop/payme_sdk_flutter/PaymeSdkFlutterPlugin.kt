@@ -3,6 +3,7 @@ package com.tamdesktop.payme_sdk_flutter
 import android.app.Activity
 import android.content.Context
 import androidx.annotation.NonNull
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -16,6 +17,7 @@ import org.json.JSONObject
 import vn.payme.sdk.PayME
 import vn.payme.sdk.enums.*
 import vn.payme.sdk.model.InfoPayment
+import vn.payme.sdk.model.Method
 import vn.payme.sdk.model.Service
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -93,6 +95,18 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             "openService" -> {
                 openService(call, result)
             }
+            "close" -> {
+                close()
+            }
+            "openHistory" -> {
+                openHistory(result)
+            }
+            "scanQR" -> {
+                scanQR(call, result)
+            }
+            "payQRCode" -> {
+                payQRCode(call, result)
+            }
             else -> {
                 result.success("Android ${android.os.Build.VERSION.RELEASE}")
             }
@@ -123,13 +137,13 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
 
-        var lang = when (language) {
-            "VN" -> LANGUAGES.VN
+        val lang = when (language) {
+            "VI" -> LANGUAGES.VI
             "EN" -> LANGUAGES.EN
-            else -> LANGUAGES.VN
+            else -> LANGUAGES.VI
         }
 
-        var env = when (envStr) {
+        val env = when (envStr) {
             "PRODUCTION" -> Env.PRODUCTION
             "SANDBOX" -> Env.SANDBOX
             "DEV" -> Env.DEV
@@ -235,12 +249,12 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun openWallet(@NonNull call: MethodCall, @NonNull result: Result) {
-        var fragment = activity as FragmentActivity
+        val fragment = activity as FragmentActivity
         payme.openWallet(fragment.supportFragmentManager,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -253,16 +267,16 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private fun deposit(@NonNull call: MethodCall, @NonNull result: Result) {
         val amount = call.argument<Int>("amount")
-        if (amount!=null && amount < 10000) {
+        if (amount != null && amount < 10000) {
             result.error("MIN_LIMIT", "Vui lòng nạp hơn 10.000VND", null)
             return
         }
-        var fragment = activity as FragmentActivity
+        val fragment = activity as FragmentActivity
         payme.deposit(fragment.supportFragmentManager, amount, true,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -279,12 +293,12 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.error("MIN_LIMIT", "Vui lòng rút hơn 10.000VND", null)
             return
         }
-        var fragment = activity as FragmentActivity
+        val fragment = activity as FragmentActivity
         payme.withdraw(fragment.supportFragmentManager, amount, true,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -296,12 +310,12 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun openKYC(@NonNull call: MethodCall, @NonNull result: Result) {
-        var fragment = activity as FragmentActivity
+        val fragment = activity as FragmentActivity
         payme.openKYC(fragment.supportFragmentManager,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -320,6 +334,7 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         val payCode = call.argument<String>("pay_code")
         val extraData = call.argument<String>("extra_data")
         val isShowResultUI = call.argument<Boolean>("is_show_result_ui")
+        val userName = call.argument<String>("user_name")
         if (amount == null || storeId == null || isShowResultUI == null || payCode == null || orderId == null) {
             result.error("MISSING_INFO", "Missing info", null)
             return
@@ -328,13 +343,13 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.error("MIN_LIMIT", "Vui lòng thanh toán hơn 10.000VND", null)
             return
         }
-        var fragment = activity as FragmentActivity
-        var infoPayment = InfoPayment("PAY", amount, note, orderId, storeId.toLong(), "OpenEWallet", extraData)
-        payme.pay(fragment.supportFragmentManager, infoPayment, isShowResultUI, payCode, null,
+        val fragment = activity as FragmentActivity
+        val infoPayment = InfoPayment("PAY", amount, note, orderId, storeId.toLong(), "OpenEWallet", extraData, userName)
+        payme.pay(fragment.supportFragmentManager, infoPayment, isShowResultUI, payCode,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -353,15 +368,15 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             return
         }
         var description = ""
-        if(note!=null){
+        if (note != null) {
             description = note
         }
-        var fragment = activity as FragmentActivity
+        val fragment = activity as FragmentActivity
         payme.transfer(fragment.supportFragmentManager, amount, description, true,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -378,10 +393,10 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     private fun setLanguage(@NonNull call: MethodCall, @NonNull result: Result) {
-        var lang = when (call.argument<String>("language")) {
-            "VN" -> LANGUAGES.VN
+        val lang = when (call.argument<String>("language")) {
+            "VN" -> LANGUAGES.VI
             "EN" -> LANGUAGES.EN
-            else -> LANGUAGES.VN
+            else -> LANGUAGES.VI
         }
         payme.setLanguage(context, lang)
         result.success(null)
@@ -394,13 +409,13 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.error("MISSING_INFO", "Missing info", null)
             return
         }
-        var fragment = activity as FragmentActivity
-        var service = Service(sCode, sDesc)
+        val fragment = activity as FragmentActivity
+        val service = Service(sCode, sDesc)
         payme.openService(fragment.supportFragmentManager, service,
                 onSuccess = { data: JSONObject? ->
-                    if(data == null){
+                    if (data == null) {
                         result.success(data)
-                    }else{
+                    } else {
                         result.success(data.toString())
                     }
                 },
@@ -409,6 +424,53 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.error(handleErrorCode(code), message, jsonObject)
                 }
         )
+    }
+
+    private fun close() {
+        payme.close()
+    }
+
+    private fun openHistory(@NonNull result: Result) {
+        val fragment = activity as FragmentActivity
+        payme.openHistory(fragment.supportFragmentManager, onSuccess = { data: JSONObject? ->
+            result.success(data?.toString() ?: data)
+        }, onError = { jsonObject: JSONObject?, code: Int, message: String? ->
+            println(message)
+            result.error(handleErrorCode(code), message, jsonObject)
+        })
+    }
+
+    private fun scanQR(@NonNull call: MethodCall, @NonNull result: Result) {
+        val fragment = activity as FragmentActivity
+        val payCode = call.argument<String>("pay_code")
+        if (payCode == null) {
+            result.error("MISSING_INFO", "Missing info", null)
+            return
+        }
+        payme.scanQR(fragment.supportFragmentManager, payCode!!, onSuccess = { data: JSONObject? ->
+           result.success(data?.toString() ?: data)
+        }, onError = { jsonObject: JSONObject?, code: Int, message: String? ->
+            println(message)
+            result.error(handleErrorCode(code), message, jsonObject)
+        })
+    }
+
+    private fun payQRCode(@NonNull call: MethodCall, @NonNull result: Result) {
+        val fragment = activity as FragmentActivity
+        val qr = call.argument<String>("qr")
+        val payCode = call.argument<String>("pay_code")
+        val isShowResultUI = call.argument<Boolean>("is_show_result_ui") ?: true
+        if (qr == null && payCode == null) {
+            result.error("MISSING_INFO", "Missing info", null)
+            return
+        }
+        payme.payQRCode(fragment.supportFragmentManager, qr = qr!!, payCode = payCode!!, isShowResultUI = isShowResultUI,
+                onSuccess = { data: JSONObject? ->
+            result.success(data?.toString() ?: data)
+        }, onError = { jsonObject: JSONObject?, code: Int, message: String? ->
+            println(message)
+            result.error(handleErrorCode(code), message, jsonObject)
+        })
     }
 
     private fun handleErrorCode(code: Int): String {

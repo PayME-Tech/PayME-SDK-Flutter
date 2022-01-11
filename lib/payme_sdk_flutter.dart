@@ -43,12 +43,12 @@ class PaymeSdkFlutterConfig {
 
 class PaymeSdkFlutter {
   static const MethodChannel _channel =
-      const MethodChannel('payme_sdk_flutter');
+  const MethodChannel('payme_sdk_flutter');
 
   static PaymeSdkFlutterEnv? currentEnv;
 
-  static Future<String> login(
-      String userId, String phone, PaymeSdkFlutterConfig config) async {
+  static Future<String> login(String userId, String phone,
+      PaymeSdkFlutterConfig config) async {
     final args = {
       'user_id': userId,
       'phone': phone,
@@ -129,15 +129,14 @@ class PaymeSdkFlutter {
     return rs;
   }
 
-  static Future<dynamic> pay(
-    int amount,
-    String storeId,
-    String orderId,
-    PaymeSdkFlutterPayCode payCode, {
-    String? note,
-    String? extraData,
-    bool isShowResultUI = true,
-  }) async {
+  static Future<dynamic> pay(int amount,
+      String storeId,
+      String orderId,
+      PaymeSdkFlutterPayCode payCode, {
+        String? note,
+        String? extraData,
+        bool isShowResultUI = true,
+      }) async {
     final args = {
       'amount': amount,
       'store_id': storeId,
@@ -163,13 +162,46 @@ class PaymeSdkFlutter {
     return rs;
   }
 
-  static Future<dynamic> openService(
-      String serviceCode, String serviceDescription) async {
+  static Future<dynamic> openService(String serviceCode,
+      String serviceDescription) async {
     final args = {
       'service_code': serviceCode,
       'service_desc': serviceDescription
     };
     final rs = await _channel.invokeMethod('openService', args);
+    if (Platform.isAndroid && rs is String) {
+      return jsonDecode(rs);
+    }
+    return rs;
+  }
+
+  static void close() {
+    _channel.invokeMethod('close');
+  }
+
+  static Future<dynamic> openHistory() async {
+    final rs = await _channel.invokeMethod('openHistory');
+  }
+
+  static Future<dynamic> scanQR(PaymeSdkFlutterPayCode payCode) async {
+    final args = {
+      "pay_code": payCode
+    };
+    final rs = await _channel.invokeMethod('scanQR', args);
+    if (Platform.isAndroid && rs is String) {
+      return jsonDecode(rs);
+    }
+    return rs;
+  }
+
+  static Future<dynamic> payQRCode(String qr, PaymeSdkFlutterPayCode payCode,
+      bool isShowResultUI) async {
+    final args = {
+      "qr": qr,
+      "pay_code": payCode,
+      "is_show_result_ui": isShowResultUI
+    };
+    final rs = await _channel.invokeMethod('payQRCode', args);
     if (Platform.isAndroid && rs is String) {
       return jsonDecode(rs);
     }
@@ -182,5 +214,8 @@ String _hexFromColor(Color color) {
 }
 
 String _enumValue(dynamic e) {
-  return e.toString().split('.').last;
+  return e
+      .toString()
+      .split('.')
+      .last;
 }
