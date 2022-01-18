@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                           final status = await PaymeSdkFlutter.login(
                               _userIdController.text, _phoneController.text, sdkArgs);
                           setState(() {
-                            _accountStatus = status;
+                            _accountStatus = status.toString();
                             _connected = true;
                           });
                           print(status);
@@ -184,9 +184,9 @@ class _MyAppState extends State<MyApp> {
                           try {
                             final response = await PaymeSdkFlutter.pay(
                               int.parse(value),
-                              '10581207',
                               DateTime.now().millisecondsSinceEpoch.toString(),
                               _payCode,
+                              storeId: '10581207'
                             );
                             print(response);
                           } on PlatformException catch (e) {

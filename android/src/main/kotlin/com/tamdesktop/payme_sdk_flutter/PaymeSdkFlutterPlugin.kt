@@ -232,7 +232,7 @@ class PaymeSdkFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private fun getSupportedServices(@NonNull call: MethodCall, @NonNull result: Result) {
         payme.getSupportedServices(
                 onSuccess = { arrService: ArrayList<Service>? ->
-                    var list = arrayListOf<Map<String, Any?>>()
+                    val list = arrayListOf<Map<String, Any?>>()
                     arrService?.forEach { service: Service ->
                         list.add(mapOf(
                                 "code" to service.code,

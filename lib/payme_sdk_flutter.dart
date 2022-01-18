@@ -19,6 +19,14 @@ enum PaymeSdkFlutterPayCode {
   ZALO_PAY,
 }
 
+enum PaymeSdkFlutterKYCState {
+  NOT_ACTIVATED,
+  NOT_KYC,
+  KYC_REVIEW,
+  KYC_REJECTED,
+  KYC_APPROVED
+}
+
 class PaymeSdkFlutterConfig {
   final String appToken;
   final String publicKey;
@@ -47,7 +55,7 @@ class PaymeSdkFlutter {
 
   static PaymeSdkFlutterEnv? currentEnv;
 
-  static Future<String> login(
+  static Future<PaymeSdkFlutterKYCState> login(
       String userId, String phone, PaymeSdkFlutterConfig config) async {
     final args = {
       'user_id': userId,
@@ -61,9 +69,10 @@ class PaymeSdkFlutter {
       'language': _enumValue(config.language),
       'env': _enumValue(config.env),
     };
-    final String version = await _channel.invokeMethod('login', args);
+    final String kycState = await _channel.invokeMethod('login', args);
     currentEnv = config.env;
-    return version;
+    return PaymeSdkFlutterKYCState.values
+        .firstWhere((e) => e.toString().split(".").last == kycState);
   }
 
   static Future<void> logout() {
@@ -131,9 +140,10 @@ class PaymeSdkFlutter {
 
   static Future<dynamic> pay(
     int amount,
-    String storeId,
     String orderId,
     PaymeSdkFlutterPayCode payCode, {
+    String? storeId,
+    String? userName,
     String? note,
     String? extraData,
     bool isShowResultUI = true,
@@ -141,6 +151,7 @@ class PaymeSdkFlutter {
     final args = {
       'amount': amount,
       'store_id': storeId,
+      'user_name': userName,
       'order_id': orderId,
       'pay_code': _enumValue(payCode),
       'note': note,
@@ -176,8 +187,8 @@ class PaymeSdkFlutter {
     return rs;
   }
 
-  static void close() {
-    _channel.invokeMethod('close');
+  static Future<void> close() {
+    return _channel.invokeMethod('close');
   }
 
   static Future<dynamic> openHistory() async {
