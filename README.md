@@ -17,13 +17,14 @@ PayME SDK là bộ thư viện để các app có thể tương tác với PayME
 
 ## Cách cài đặt:
 
-PayMESDK đang được lưu trữ trên nền tảng CocoaPods. Để cài đặt, đơn giản thêm dòng sau vào Podfile của bạn:
+Thêm dòng này vào pubspec.yaml:
 
 ```json
-pod 'PayMESDK'
+dependencies:
+  payme_sdk_offical: ^1.1.7
 ```
 
-Sau đó chạy lệnh <code>pod install</code> để hoàn tất cài dặt
+Sau đó chạy lệnh <code>dart pub get</code> để hoàn tất cài dặt
 
 **Info.plist**
 
