@@ -1,8 +1,8 @@
-name: payme_sdk_flutter
+name: payme_sdk_offical
 description: PayME SDK Flutter is plugin for application integrate with PayME Platform.
-version: 1.1.6
-homepage: https://github.com/tamdesktop/PayME-SDK-Flutter
-repository: https://github.com/tamdesktop/PayME-SDK-Flutter
+version: 1.1.8
+homepage: https://github.com/PayME-Tech/PayME-SDK-Flutter
+repository: https://github.com/PayME-Tech/PayME-SDK-Flutter
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
